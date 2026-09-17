@@ -9,11 +9,9 @@
   "section_break_8otr",
   "passenger",
   "status",
-  "is_published",
   "column_break_iqsf",
   "flight",
   "seat",
-  "route",
   "section_break_pzcg",
   "source_airport_code",
   "column_break_wwfx",
@@ -165,24 +163,12 @@
    "fieldtype": "Currency",
    "label": "Total Amount",
    "read_only": 1
-  },
-  {
-   "default": "0",
-   "fieldname": "is_published",
-   "fieldtype": "Check",
-   "label": "Is Published"
-  },
-  {
-   "fieldname": "route",
-   "fieldtype": "Data",
-   "label": "Route"
   }
  ],
  "grid_page_length": 50,
- "is_published_field": "is_published",
  "is_submittable": 1,
  "links": [],
- "modified": "2026-09-16 02:48:16.463424",
+ "modified": "2026-09-17 10:14:12.112088",
  "modified_by": "Administrator",
  "module": "Airplane Mode",
  "name": "Airplane Ticket",
