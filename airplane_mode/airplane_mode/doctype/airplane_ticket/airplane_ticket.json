@@ -11,6 +11,7 @@
   "status",
   "column_break_iqsf",
   "seat",
+  "flight",
   "section_break_pzcg",
   "source_airport_code",
   "column_break_wwfx",
@@ -155,19 +156,26 @@
    "fieldtype": "Currency",
    "label": "Total Amount",
    "read_only": 1
+  },
+  {
+   "fieldname": "flight",
+   "fieldtype": "Link",
+   "label": "Flight",
+   "options": "Airplane Flight",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "is_submittable": 1,
  "links": [],
-"modified": "2026-09-18 00:21:33.243735",
-"modified_by": "Administrator",
-"module": "Airplane Mode",
-"name": "Airplane Ticket",
-"naming_rule": "Autoincrement",
-"owner": "Administrator",
-"permissions": [
-    {
+ "modified": "2026-09-18 01:00:21.921755",
+ "modified_by": "Administrator",
+ "module": "Airplane Mode",
+ "name": "Airplane Ticket",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
    "create": 1,
    "delete": 1,
    "email": 1,
