@@ -11,7 +11,6 @@
   "status",
   "is_published",
   "column_break_iqsf",
-  "flight",
   "seat",
   "route",
   "section_break_pzcg",
@@ -63,13 +62,6 @@
    "in_list_view": 1,
    "label": "Destination Airport Code",
    "read_only": 1
-  },
-  {
-   "fieldname": "flight",
-   "fieldtype": "Link",
-   "label": "Flight",
-   "options": "Airplane Flight",
-   "reqd": 1
   },
   {
    "fieldname": "section_break_jadf",
@@ -182,7 +174,7 @@
  "is_published_field": "is_published",
  "is_submittable": 1,
  "links": [],
- "modified": "2026-09-16 02:48:16.463424",
+ "modified": "2026-09-18 00:21:33.243735",
  "modified_by": "Administrator",
  "module": "Airplane Mode",
  "name": "Airplane Ticket",
