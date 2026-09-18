@@ -1,4 +1,4 @@
-{% set airline = frappe.db.get_value("Airplane", doc.airplane, "airline_name") %}
+{% set airline = frappe.db.get_value("Airplane", doc.airplane, "airline") %}
 
 <div style="
     border: 1px solid #e0e0e0;
@@ -7,22 +7,31 @@
     margin-bottom: 12px;
 ">
 
-    <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">
+    <div style="
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 4px;
+    ">
         {{ airline }}
     </div>
 
-    <div style="font-size: 14px; color: #666; margin-bottom: 12px;">
-        {{ doc.source_airport }} → {{ doc.destination_airport }}
+    <div style="
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 12px;
+    ">
+        {{ doc.source_airport_code }} → {{ doc.destination_airport_code }}
     </div>
 
-	<div style="font-size: 14px; color: #666; margin-bottom: 16px;">
-		{{ frappe.utils.formatdate(doc.date_of_departure, "dd MMMM, yyyy") }}
-		| {{ doc.time_of_departure }}
-		|
-		{% set hours = (doc.duration // 3600) | int %}
-		{% set minutes = ((doc.duration % 3600) // 60) | int %}
-		{{ hours }}h {{ minutes }}m
-	</div>
+    <div style="
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 16px;
+    ">
+        {{ frappe.utils.formatdate(doc.date_of_departure, "dd MMMM, yyyy") }}
+        | {{ doc.time_of_departure }}
+        | {{ frappe.utils.format_duration(doc.duration) }}
+    </div>
 
     <a href="{{ doc.route }}" style="
         color: #2490ef;
