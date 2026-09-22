@@ -2,6 +2,24 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Airplane Ticket", {
+    refresh(frm){
+        frm.add_custom_button("Assign Seat",() =>{
+            frappe.prompt(
+                [
+                    {
+                        label: "Seat Number",
+                        fieldname: "seat",
+                        fieldtype: "Data"
+                    }
+                ],
+                (values) => {
+                    cur_frm.set_value("seat", values.seat);
+                },
+                "Assign Seat",
+                "Assign"
+            )
+        },"Actions");
+    },
     flight_price(frm) {
         calculate_total_amount(frm);
     },
@@ -34,3 +52,5 @@ function calculate_total_amount(frm) {
 
     frm.set_value("total_amount", total);
 }
+
+

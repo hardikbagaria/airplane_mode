@@ -4,7 +4,9 @@ import frappe
 from frappe.model.document import Document
 import random
 
+
 class AirplaneTicket(Document):
+
     def before_insert(self):
         number = random.randint(1, 99)
 
@@ -12,18 +14,32 @@ class AirplaneTicket(Document):
         letter = random.choice(letters)
 
         self.seat = str(number) + letter
+
     def before_submit(self):
         if self.status != "Boarded":
             frappe.throw("Airplane Ticket can only be submitted when the status is Boarded.")
 
     def validate(self):
         self.calculate_total_amount()
+
         types = []
 
         for row in self.add_ons:
             if row.item in types:
                 frappe.throw(f"Add-on Type {row.item} can only be added once.")
             types.append(row.item)
+
+        # Check airplane capacity
+        flight = frappe.get_doc("Airplane Flight", self.flight)
+        airplane = frappe.get_doc("Airplane", flight.airplane)
+
+        ticket_count = frappe.db.count(
+            "Airplane Ticket",
+            {"flight": self.flight}
+        )
+
+        if ticket_count >= airplane.capacity:
+            frappe.throw("No more seats available for this flight.")
 
     def calculate_total_amount(self):
         total = self.flight_price or 0
@@ -32,4 +48,3 @@ class AirplaneTicket(Document):
             total += add_on.amount or 0
 
         self.total_amount = total
-    
