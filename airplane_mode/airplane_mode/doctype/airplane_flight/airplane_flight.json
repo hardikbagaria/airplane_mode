@@ -10,6 +10,7 @@
   "section_break_khk5",
   "airplane",
   "is_published",
+  "gate",
   "column_break_xxse",
   "status",
   "route",
@@ -24,7 +25,9 @@
   "duration",
   "column_break_tblv",
   "time_of_departure",
-  "amended_from"
+  "amended_from",
+  "flight_crew_section",
+  "crew_members"
  ],
  "fields": [
   {
@@ -139,6 +142,24 @@
   {
    "fieldname": "column_break_tblv",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "flight_crew_section",
+   "fieldtype": "Section Break",
+   "label": "Flight Crew"
+  },
+  {
+   "fieldname": "crew_members",
+   "fieldtype": "Table",
+   "label": "Crew Members",
+   "options": "Flight Crew Member",
+   "reqd": 1
+  },
+  {
+   "fieldname": "gate",
+   "fieldtype": "Data",
+   "label": "Gate",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
@@ -147,7 +168,7 @@
  "is_published_field": "is_published",
  "is_submittable": 1,
  "links": [],
- "modified": "2026-09-25 00:56:38.638034",
+ "modified": "2026-09-27 21:24:23.448173",
  "modified_by": "Administrator",
  "module": "Airplane Mode",
  "name": "Airplane Flight",

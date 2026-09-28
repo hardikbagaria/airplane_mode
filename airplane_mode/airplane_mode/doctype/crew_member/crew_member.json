@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "EMP-.{airline}.-.###",
  "creation": "2026-09-27 19:40:57.417610",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -54,6 +55,7 @@
   {
    "fieldname": "role",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Role",
    "options": "Captain\nFirst Officer\nAir Hostesses\nCabin Crew\nFlight Engineer",
    "reqd": 1
@@ -62,10 +64,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-09-27 19:45:28.762626",
+ "modified": "2026-09-27 20:39:28.520838",
  "modified_by": "Administrator",
  "module": "Airplane Mode",
  "name": "Crew Member",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
