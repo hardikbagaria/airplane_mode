@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="/assets/airplane_mode/css/picnic.min.css">
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+        nav.brand-nav {
+            background-color: #1a365d;
+            color: #ffffff;
+            padding: 12px 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        nav.brand-nav a.brand-logo {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: #ffffff;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .detail-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+            margin-bottom: 25px;
+        }
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+        .detail-header h1 {
+            margin: 0;
+            color: #1a365d;
+            font-size: 1.8rem;
+        }
+        .detail-header p {
+            margin: 5px 0 0 0;
+            color: #718096;
+            font-size: 1rem;
+        }
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .spec-table tr {
+            border-bottom: 1px solid #edf2f7;
+        }
+        .spec-table td {
+            padding: 12px 10px;
+            font-size: 1rem;
+        }
+        .spec-table td.label {
+            width: 35%;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        .badge-available {
+            background-color: #38a169;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-occupied {
+            background-color: #e53e3e;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-maintenance {
+            background-color: #dd6b20;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .action-box {
+            background: #ebf8ff;
+            border: 2px dashed #3182ce;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .action-box h2 {
+            margin: 0 0 10px 0;
+            color: #2b6cb0;
+        }
+        .action-box p {
+            margin: 0 0 20px 0;
+            color: #4a5568;
+            font-size: 1.05rem;
+        }
+        .unavailable-box {
+            background: #fffaf0;
+            border: 1px solid #feebc8;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            color: #744210;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="brand-nav">
+        <a href="/shops" class="brand-logo">✈️ Airport Commercial Leasing</a>
+    </nav>
+
+    <div class="container">
+        <p style="margin-bottom: 20px;">
+            <a href="/shops" class="button pseudo">&larr; Back to Shop Directory</a>
+        </p>
+
+        <div class="detail-card">
+            <div class="detail-header">
+                <div>
+                    <h1>Shop #{{ shop.shop_number }} — {{ shop.shop_name }}</h1>
+                    <p>{{ shop.airport }}{% if airport and airport.city %}, {{ airport.city }}{% endif %}</p>
+                </div>
+                <div>
+                    {% if shop.shop_status == "Available" %}
+                        <span class="badge-available">Available for Lease</span>
+                    {% elif shop.shop_status == "Occupied" %}
+                        <span class="badge-occupied">Currently Occupied</span>
+                    {% else %}
+                        <span class="badge-maintenance">Under Maintenance</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h3 style="color: #1a365d; margin-bottom: 15px;">Shop Specifications</h3>
+            <table class="spec-table">
+                <tbody>
+                    <tr>
+                        <td class="label">Shop Number:</td>
+                        <td><strong>{{ shop.shop_number }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Shop Name:</td>
+                        <td>{{ shop.shop_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Airport:</td>
+                        <td>{{ shop.airport }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Total Floor Area:</td>
+                        <td>{{ shop.area }} sq ft</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Monthly Lease Rent:</td>
+                        <td><strong>₹{{ "{:,.2f}".format(shop.rent_amount or 0) }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Availability Status:</td>
+                        <td>{{ shop.shop_status }}</td>
+                    </tr>
+                    {% if shop.description %}
+                    <tr>
+                        <td class="label">Description / Features:</td>
+                        <td>{{ shop.description }}</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+
+            {% if shop.shop_status == "Available" %}
+                <div class="action-box">
+                    <h2>Interested in Renting this Space?</h2>
+                    <p>Express your interest to obtain leasing terms and discuss your proposed retail business.</p>
+                    <a href="/shop-lead/new?shop={{ shop.name }}" class="button success" style="font-size: 1.1rem; padding: 12px 30px; text-decoration: none;">
+                        📝 Submit Commercial Lease Inquiry
+                    </a>
+                </div>
+            {% elif shop.shop_status == "Occupied" %}
+                <div class="unavailable-box">
+                    <strong>Notice:</strong> This retail unit is currently under an active lease and is not available for new inquiries.
+                </div>
+            {% else %}
+                <div class="unavailable-box">
+                    <strong>Maintenance Notice:</strong> This space is temporarily unavailable while maintenance is being carried out.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

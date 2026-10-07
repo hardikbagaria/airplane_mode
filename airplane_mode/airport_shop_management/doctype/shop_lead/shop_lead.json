@@ -1,11 +1,15 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "LEAD-.YYYY.-.#####",
  "creation": "2026-10-07 22:22:21.367297",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "shop",
+  "airport",
+  "shop_number",
+  "shop_name",
   "name1",
   "email",
   "phone",
@@ -18,9 +22,32 @@
   {
    "fieldname": "shop",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Shop",
    "options": "Airport Shop",
    "reqd": 1
+  },
+  {
+   "fetch_from": "shop.airport",
+   "fieldname": "airport",
+   "fieldtype": "Link",
+   "label": "Airport",
+   "options": "Airport",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "shop.shop_number",
+   "fieldname": "shop_number",
+   "fieldtype": "Data",
+   "label": "Shop Number",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "shop.shop_name",
+   "fieldname": "shop_name",
+   "fieldtype": "Data",
+   "label": "Shop Name",
+   "read_only": 1
   },
   {
    "fieldname": "name1",
@@ -32,13 +59,14 @@
   {
    "fieldname": "email",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Email",
    "options": "Email",
    "reqd": 1
   },
   {
    "fieldname": "phone",
-   "fieldtype": "Phone",
+   "fieldtype": "Data",
    "label": "Phone"
   },
   {
@@ -55,6 +83,7 @@
    "default": "New",
    "fieldname": "status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Status",
    "options": "New\nContacted\nConverted\nRejected",
    "reqd": 1
@@ -62,14 +91,13 @@
   {
    "fieldname": "created_on",
    "fieldtype": "Datetime",
-   "label": "Created On",
-   "reqd": 1
+   "label": "Created On"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-07 22:24:07.130715",
+ "modified": "2026-10-07 23:54:00.000000",
  "modified_by": "Administrator",
  "module": "Airport Shop Management",
  "name": "Shop Lead",
@@ -86,6 +114,14 @@
    "role": "System Manager",
    "share": 1,
    "write": 1
+  },
+  {
+   "create": 1,
+   "email": 0,
+   "print": 0,
+   "read": 0,
+   "role": "Guest",
+   "write": 0
   }
  ],
  "row_format": "Dynamic",

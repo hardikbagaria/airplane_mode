@@ -1,15 +1,22 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "CONT-.YYYY.-.#####",
  "creation": "2026-10-07 17:34:41.257028",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "contract_section",
   "shop",
+  "airport",
+  "shop_name",
   "contract_status",
   "column_break_eifp",
   "tenant",
+  "company_name",
+  "tenant_name",
+  "tenant_email",
+  "tenant_phone",
   "contract_info_section",
   "contract_start_date",
   "column_break_gczd",
@@ -24,6 +31,11 @@
  ],
  "fields": [
   {
+   "fieldname": "contract_section",
+   "fieldtype": "Section Break",
+   "label": "Contract Info"
+  },
+  {
    "fieldname": "shop",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -32,11 +44,69 @@
    "reqd": 1
   },
   {
+   "fetch_from": "shop.airport",
+   "fieldname": "airport",
+   "fieldtype": "Link",
+   "label": "Airport",
+   "options": "Airport",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "shop.shop_name",
+   "fieldname": "shop_name",
+   "fieldtype": "Data",
+   "label": "Shop Name",
+   "read_only": 1
+  },
+  {
+   "default": "Active",
+   "fieldname": "contract_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Contract Status",
+   "options": "Draft\nActive\nExpired\nTerminated",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_eifp",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "tenant",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Tenant",
    "options": "Shop Tenant",
    "reqd": 1
+  },
+  {
+   "fetch_from": "tenant.company_name",
+   "fieldname": "company_name",
+   "fieldtype": "Data",
+   "label": "Company Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "tenant.tenant_name",
+   "fieldname": "tenant_name",
+   "fieldtype": "Data",
+   "label": "Tenant Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "tenant.email",
+   "fieldname": "tenant_email",
+   "fieldtype": "Data",
+   "label": "Tenant Email",
+   "options": "Email",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "tenant.phone",
+   "fieldname": "tenant_phone",
+   "fieldtype": "Phone",
+   "label": "Tenant Phone",
+   "read_only": 1
   },
   {
    "fieldname": "contract_info_section",
@@ -46,12 +116,18 @@
   {
    "fieldname": "contract_start_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Contract Start Date",
    "reqd": 1
   },
   {
+   "fieldname": "column_break_gczd",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "contract_end_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Contract End Date",
    "reqd": 1
   },
@@ -68,13 +144,7 @@
    "reqd": 1
   },
   {
-   "fieldname": "security_deposit",
-   "fieldtype": "Currency",
-   "label": "Security Deposit",
-   "non_negative": 1,
-   "reqd": 1
-  },
-  {
+   "default": "Monthly",
    "fieldname": "payment_frequency",
    "fieldtype": "Select",
    "label": "Payment Frequency",
@@ -82,22 +152,15 @@
    "reqd": 1
   },
   {
-   "fieldname": "contract_status",
-   "fieldtype": "Select",
-   "label": "Contract Status",
-   "options": "Valid Invalid"
-  },
-  {
-   "fieldname": "column_break_gczd",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_eifp",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "column_break_secp",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "security_deposit",
+   "fieldtype": "Currency",
+   "label": "Security Deposit",
+   "non_negative": 1
   },
   {
    "fieldname": "section_break_qxyl",
@@ -106,19 +169,14 @@
   },
   {
    "fieldname": "notes",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "label": "Notes"
-  },
-  {
-   "fieldname": "contract_section",
-   "fieldtype": "Section Break",
-   "label": "Contract Info"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-07 17:39:35.844220",
+ "modified": "2026-10-07 23:52:00.000000",
  "modified_by": "Administrator",
  "module": "Airport Shop Management",
  "name": "Shop Contract",

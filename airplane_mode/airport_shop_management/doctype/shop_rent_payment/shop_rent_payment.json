@@ -1,90 +1,169 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "PAY-.YYYY.-.#####",
  "creation": "2026-10-07 22:14:08.374701",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "connections_section",
   "contract",
-  "tenant",
-  "column_break_ssyu",
+  "airport",
   "shop",
-  "section_break_kbsc",
-  "payment_date",
-  "due_date",
+  "shop_number",
+  "shop_name",
+  "column_break_ssyu",
+  "tenant",
+  "tenant_name",
+  "tenant_email",
+  "billing_section",
   "rent_month",
+  "due_date",
   "column_break_sifn",
-  "payment_status",
   "amount_due",
   "amount_paid",
-  "section_break_opvl",
+  "payment_status",
+  "payment_details_section",
+  "payment_date",
   "payment_mode",
   "column_break_ofrn",
   "transaction_reference",
+  "last_reminder_sent",
   "section_break_ljyz",
   "remarks"
  ],
  "fields": [
   {
-   "fieldname": "payment_date",
-   "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Payment Date",
-   "reqd": 1
-  },
-  {
-   "fieldname": "shop",
-   "fieldtype": "Link",
-   "label": "Shop",
-   "options": "Airport Shop",
-   "reqd": 1
-  },
-  {
-   "fieldname": "tenant",
-   "fieldtype": "Link",
-   "label": "Tenant",
-   "options": "Shop Tenant",
-   "reqd": 1
+   "fieldname": "connections_section",
+   "fieldtype": "Section Break",
+   "label": "Contract & Shop Details"
   },
   {
    "fieldname": "contract",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Contract",
    "options": "Shop Contract",
    "reqd": 1
   },
   {
+   "fetch_from": "contract.airport",
+   "fieldname": "airport",
+   "fieldtype": "Link",
+   "label": "Airport",
+   "options": "Airport",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "contract.shop",
+   "fieldname": "shop",
+   "fieldtype": "Link",
+   "label": "Shop",
+   "options": "Airport Shop",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "shop.shop_number",
+   "fieldname": "shop_number",
+   "fieldtype": "Data",
+   "label": "Shop Number",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "contract.shop_name",
+   "fieldname": "shop_name",
+   "fieldtype": "Data",
+   "label": "Shop Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ssyu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "contract.tenant",
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "Shop Tenant",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "contract.tenant_name",
+   "fieldname": "tenant_name",
+   "fieldtype": "Data",
+   "label": "Tenant Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "contract.tenant_email",
+   "fieldname": "tenant_email",
+   "fieldtype": "Data",
+   "label": "Tenant Email",
+   "options": "Email",
+   "read_only": 1
+  },
+  {
+   "fieldname": "billing_section",
+   "fieldtype": "Section Break",
+   "label": "Billing Period & Status"
+  },
+  {
+   "description": "Format: YYYY-MM (e.g. 2026-10)",
    "fieldname": "rent_month",
-   "fieldtype": "Date",
+   "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Rent Month",
-   "reqd": 1
-  },
-  {
-   "fieldname": "amount_due",
-   "fieldtype": "Currency",
-   "label": "Amount Due",
-   "non_negative": 1,
-   "reqd": 1
-  },
-  {
-   "fieldname": "amount_paid",
-   "fieldtype": "Currency",
-   "label": "Amount Paid",
-   "non_negative": 1,
    "reqd": 1
   },
   {
    "fieldname": "due_date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "Due Date",
    "reqd": 1
   },
   {
+   "fieldname": "column_break_sifn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "contract.monthly_rent",
+   "fieldname": "amount_due",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount Due",
+   "non_negative": 1,
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "amount_paid",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount Paid",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "default": "Pending",
    "fieldname": "payment_status",
    "fieldtype": "Select",
+   "in_list_view": 1,
    "label": "Payment Status",
-   "options": "Pending\nPaid\nPartially Paid\nOverdue"
+   "options": "Pending\nPartially Paid\nPaid\nOverdue",
+   "read_only": 1
+  },
+  {
+   "fieldname": "payment_details_section",
+   "fieldtype": "Section Break",
+   "label": "Payment Details"
+  },
+  {
+   "fieldname": "payment_date",
+   "fieldtype": "Date",
+   "label": "Payment Date"
   },
   {
    "fieldname": "payment_mode",
@@ -93,49 +172,35 @@
    "options": "Cash\nBank Transfer\nUPI\nCheque\nOther"
   },
   {
+   "fieldname": "column_break_ofrn",
+   "fieldtype": "Column Break"
+  },
+  {
    "fieldname": "transaction_reference",
    "fieldtype": "Data",
    "label": "Transaction Reference"
   },
   {
-   "fieldname": "remarks",
-   "fieldtype": "Small Text",
-   "label": "Remarks"
-  },
-  {
-   "fieldname": "section_break_kbsc",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "connections_section",
-   "fieldtype": "Section Break",
-   "label": "Connections"
-  },
-  {
-   "fieldname": "column_break_ssyu",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "column_break_sifn",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "section_break_opvl",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_ofrn",
-   "fieldtype": "Column Break"
+   "fieldname": "last_reminder_sent",
+   "fieldtype": "Date",
+   "label": "Last Reminder Sent",
+   "read_only": 1
   },
   {
    "fieldname": "section_break_ljyz",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-07 22:21:29.173350",
+ "modified": "2026-10-07 23:53:00.000000",
  "modified_by": "Administrator",
  "module": "Airport Shop Management",
  "name": "Shop Rent Payment",

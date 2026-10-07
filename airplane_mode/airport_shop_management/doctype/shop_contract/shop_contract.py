@@ -1,9 +1,262 @@
 # Copyright (c) 2026, Haradik Bagaria - AESPL and contributors
 # For license information, please see license.txt
 
-# import frappe
+import datetime
+import frappe
+from frappe import _
 from frappe.model.document import Document
+from frappe.utils import flt, getdate, today
 
 
 class ShopContract(Document):
-	pass
+	def validate(self):
+		self.validate_mandatory_fields()
+		self.validate_dates()
+		self.validate_monthly_rent()
+		self.validate_security_deposit()
+		self.validate_status_and_frequency()
+		self.fetch_and_validate_shop_details()
+		self.fetch_and_validate_tenant_details()
+		self.validate_no_overlapping_active_contracts()
+		self.validate_shortening_against_paid_records()
+
+	def validate_mandatory_fields(self):
+		if not self.shop:
+			frappe.throw(_("Shop is required."))
+		if not self.tenant:
+			frappe.throw(_("Tenant is required."))
+		if not self.contract_start_date:
+			frappe.throw(_("Contract Start Date is required."))
+		if not self.contract_end_date:
+			frappe.throw(_("Contract End Date is required."))
+
+	def validate_dates(self):
+		if getdate(self.contract_end_date) <= getdate(self.contract_start_date):
+			frappe.throw(_("Contract End Date must be after Contract Start Date."))
+
+	def validate_monthly_rent(self):
+		if self.is_new() and (self.monthly_rent is None or self.monthly_rent == ""):
+			default_rent = frappe.db.get_single_value(
+				"Shop Management Settings", "default_rent_amount"
+			)
+			if default_rent and flt(default_rent) > 0:
+				self.monthly_rent = flt(default_rent)
+
+		if self.monthly_rent is None or flt(self.monthly_rent) <= 0:
+			frappe.throw(_("Monthly Rent must be greater than 0."))
+
+	def validate_security_deposit(self):
+		if flt(self.security_deposit) < 0:
+			frappe.throw(_("Security Deposit cannot be negative."))
+
+	def validate_status_and_frequency(self):
+		valid_freqs = ["Monthly", "Quarterly", "Half-Yearly", "Yearly"]
+		if self.payment_frequency not in valid_freqs:
+			frappe.throw(_("Payment Frequency must be one of: {0}.").format(", ".join(valid_freqs)))
+
+		valid_statuses = ["Draft", "Active", "Expired", "Terminated"]
+		if self.contract_status not in valid_statuses:
+			frappe.throw(_("Contract Status must be one of: {0}.").format(", ".join(valid_statuses)))
+
+	def fetch_and_validate_shop_details(self):
+		shop = frappe.get_doc("Airport Shop", self.shop)
+		self.airport = shop.airport
+		self.shop_name = shop.shop_name
+
+	def fetch_and_validate_tenant_details(self):
+		tenant = frappe.get_doc("Shop Tenant", self.tenant)
+		if tenant.status != "Active":
+			frappe.throw(_("Selected Tenant {0} is Inactive.").format(self.tenant))
+		self.tenant_name = tenant.tenant_name
+		self.tenant_email = tenant.email
+		self.tenant_phone = tenant.phone
+		self.company_name = tenant.company_name
+
+	def validate_no_overlapping_active_contracts(self):
+		if self.contract_status != "Active":
+			return
+
+		overlapping = frappe.db.sql(
+			"""
+			SELECT name, contract_start_date, contract_end_date
+			FROM `tabShop Contract`
+			WHERE shop = %(shop)s
+			  AND name != %(name)s
+			  AND contract_status = 'Active'
+			  AND contract_start_date <= %(end_date)s
+			  AND contract_end_date >= %(start_date)s
+			""",
+			{
+				"shop": self.shop,
+				"name": self.name or "",
+				"start_date": self.contract_start_date,
+				"end_date": self.contract_end_date,
+			},
+			as_dict=True,
+		)
+		if overlapping:
+			frappe.throw(
+				_("Shop {0} already has an overlapping active contract.").format(self.shop)
+			)
+
+	def validate_shortening_against_paid_records(self):
+		if self.is_new():
+			return
+
+		months = get_months_in_range(self.contract_start_date, self.contract_end_date)
+		paid_outside = frappe.db.sql(
+			"""
+			SELECT name, rent_month, amount_paid
+			FROM `tabShop Rent Payment`
+			WHERE contract = %(contract)s
+			  AND amount_paid > 0
+			  AND rent_month NOT IN %(months)s
+			""",
+			{
+				"contract": self.name,
+				"months": tuple(months) if months else ("__none__",),
+			},
+			as_dict=True,
+		)
+		if paid_outside:
+			frappe.throw(
+				_(
+					"Cannot shorten contract duration because paid rent records exist for months outside the new date range."
+				)
+			)
+
+	def on_update(self):
+		sync_shop_lease_status(self.shop)
+		if self.contract_status == "Active":
+			generate_rent_schedule(self.name)
+
+	def before_delete(self):
+		paid_payments = frappe.db.exists(
+			"Shop Rent Payment", {"contract": self.name, "amount_paid": [">", 0]}
+		)
+		if paid_payments:
+			frappe.throw(
+				_("Cannot delete contract {0} because paid rent records exist.").format(self.name)
+			)
+		frappe.db.delete("Shop Rent Payment", {"contract": self.name, "amount_paid": 0})
+		sync_shop_lease_status(self.shop, exclude_contract=self.name)
+
+	def on_trash(self):
+		sync_shop_lease_status(self.shop, exclude_contract=self.name)
+
+
+def sync_shop_lease_status(shop_name, exclude_contract=None):
+	"""
+	Synchronizes Airport Shop status and current_contract/current_tenant
+	based on active contracts in the database.
+	"""
+	if not shop_name or not frappe.db.exists("Airport Shop", shop_name):
+		return
+
+	filters = {"shop": shop_name, "contract_status": "Active"}
+	if exclude_contract:
+		filters["name"] = ["!=", exclude_contract]
+
+	active_contract = frappe.db.get_value(
+		"Shop Contract",
+		filters,
+		["name", "tenant"],
+		as_dict=True,
+	)
+	current_status = frappe.db.get_value("Airport Shop", shop_name, "shop_status")
+
+	if active_contract:
+		frappe.db.set_value(
+			"Airport Shop",
+			shop_name,
+			{
+				"shop_status": "Occupied",
+				"current_contract": active_contract.name,
+				"current_tenant": active_contract.tenant,
+			},
+			update_modified=False,
+		)
+	else:
+		# If under maintenance, keep under maintenance, otherwise Available
+		new_status = "Under Maintenance" if current_status == "Under Maintenance" else "Available"
+		frappe.db.set_value(
+			"Airport Shop",
+			shop_name,
+			{
+				"shop_status": new_status,
+				"current_contract": None,
+				"current_tenant": None,
+			},
+			update_modified=False,
+		)
+
+
+def get_months_in_range(start_date, end_date):
+	"""
+	Returns list of 'YYYY-MM' strings between start_date and end_date inclusive.
+	"""
+	start = getdate(start_date)
+	end = getdate(end_date)
+	months = []
+	curr = datetime.date(start.year, start.month, 1)
+	end_month_first = datetime.date(end.year, end.month, 1)
+
+	while curr <= end_month_first:
+		months.append(curr.strftime("%Y-%m"))
+		year = curr.year + (1 if curr.month == 12 else 0)
+		month = 1 if curr.month == 12 else curr.month + 1
+		curr = datetime.date(year, month, 1)
+
+	return months
+
+
+@frappe.whitelist()
+def generate_rent_schedule(contract_name):
+	"""
+	Generates Shop Rent Payment records for each month covered by the contract.
+	Idempotent: does not duplicate existing payment records.
+	Cleans up pending unpaid records outside the contract duration if shortened.
+	"""
+	contract = frappe.get_doc("Shop Contract", contract_name)
+	if contract.contract_status not in ["Active", "Draft"]:
+		return []
+
+	months = get_months_in_range(contract.contract_start_date, contract.contract_end_date)
+	created_payments = []
+
+	for rent_month in months:
+		existing = frappe.db.exists(
+			"Shop Rent Payment",
+			{"contract": contract.name, "rent_month": rent_month},
+		)
+		if not existing:
+			due_date = f"{rent_month}-01"
+			payment = frappe.get_doc(
+				{
+					"doctype": "Shop Rent Payment",
+					"contract": contract.name,
+					"shop": contract.shop,
+					"tenant": contract.tenant,
+					"airport": contract.airport,
+					"rent_month": rent_month,
+					"due_date": due_date,
+					"amount_due": flt(contract.monthly_rent),
+					"amount_paid": 0,
+					"payment_status": "Overdue" if getdate(today()) > getdate(due_date) else "Pending",
+				}
+			)
+			payment.insert(ignore_permissions=True)
+			created_payments.append(payment.name)
+
+	# Clean up any unpaid Pending/Overdue records that are outside the contract duration
+	existing_unpaid = frappe.get_all(
+		"Shop Rent Payment",
+		filters={"contract": contract.name, "amount_paid": 0},
+		fields=["name", "rent_month"],
+	)
+	for p in existing_unpaid:
+		if p.rent_month not in months:
+			frappe.delete_doc("Shop Rent Payment", p.name, ignore_permissions=True)
+
+	frappe.db.commit()
+	return created_payments

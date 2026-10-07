@@ -1,0 +1,78 @@
+{
+ "allow_comments": 0,
+ "allow_delete": 0,
+ "allow_edit": 0,
+ "allow_incomplete": 0,
+ "allow_multiple": 1,
+ "allow_print": 0,
+ "anonymous": 1,
+ "apply_document_permissions": 0,
+ "button_label": "Submit Interest",
+ "client_script": "frappe.web_form.after_load = () => {\n    const params = new URLSearchParams(window.location.search);\n    const shop = params.get(\"shop\") || params.get(\"airport_shop\");\n    if (shop) {\n        frappe.web_form.set_value(\"shop\", shop);\n        frappe.web_form.set_df_property(\"shop\", \"read_only\", 1);\n    }\n};",
+ "condition_json": "[]",
+ "creation": "2026-10-08 00:00:00.000000",
+ "doc_type": "Shop Lead",
+ "docstatus": 0,
+ "doctype": "Web Form",
+ "idx": 0,
+ "is_standard": 1,
+ "list_columns": [],
+ "login_required": 0,
+ "max_attachment_size": 0,
+ "modified": "2026-10-08 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Airport Shop Management",
+ "name": "shop-lead",
+ "owner": "Administrator",
+ "published": 1,
+ "route": "shop-lead",
+ "show_attachments": 0,
+ "show_list": 0,
+ "show_sidebar": 0,
+ "success_message": "Thank you for expressing interest in leasing this airport shop. Our team will contact you shortly.",
+ "success_url": "/shops",
+ "title": "Interested in Renting a Shop?",
+ "web_form_fields": [
+  {
+   "fieldname": "shop",
+   "fieldtype": "Link",
+   "hidden": 0,
+   "label": "Airport Shop",
+   "options": "Airport Shop",
+   "reqd": 1
+  },
+  {
+   "fieldname": "name1",
+   "fieldtype": "Data",
+   "hidden": 0,
+   "label": "Full Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "hidden": 0,
+   "label": "Email Address",
+   "options": "Email",
+   "reqd": 1
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "hidden": 0,
+   "label": "Phone Number"
+  },
+  {
+   "fieldname": "company_name",
+   "fieldtype": "Data",
+   "hidden": 0,
+   "label": "Company / Brand Name"
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Small Text",
+   "hidden": 0,
+   "label": "Message / Proposed Business Plan"
+  }
+ ]
+}

@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:tenant_name",
  "creation": "2026-10-07 17:32:05.049665",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -63,6 +64,7 @@
    "label": "Contact Person Name"
   },
   {
+   "default": "Active",
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
@@ -82,7 +84,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-07 17:34:15.634451",
+ "modified": "2026-10-07 23:51:00.000000",
  "modified_by": "Administrator",
  "module": "Airport Shop Management",
  "name": "Shop Tenant",
