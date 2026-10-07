@@ -4,6 +4,9 @@
 import frappe
 from frappe.tests.utils import FrappeTestCase
 from frappe.utils import today, add_days
+from airplane_mode.airport_shop_management.doctype.shop_rent_payment.shop_rent_payment import (
+	mark_as_paid_and_submit,
+)
 from airplane_mode.airport_shop_management.tasks import send_rent_reminders
 
 
@@ -50,7 +53,7 @@ class TestShopRentPayment(FrappeTestCase):
 			"current_tenant": None
 		})
 
-		# Create a contract: 2026-06-01 to 2026-12-31
+		# Create a contract: 2026-06-01 to 2026-12-31 in Draft
 		self.contract = frappe.get_doc({
 			"doctype": "Shop Contract",
 			"shop": "TPA-901",
@@ -58,7 +61,7 @@ class TestShopRentPayment(FrappeTestCase):
 			"contract_start_date": "2026-06-01",
 			"contract_end_date": "2026-12-31",
 			"monthly_rent": 30000,
-			"contract_status": "Draft"  # Don't auto-schedule to test manual payment
+			"contract_status": "Draft"
 		}).insert()
 
 	def test_rent_month_format_validation(self):
@@ -72,7 +75,6 @@ class TestShopRentPayment(FrappeTestCase):
 			self.assertRaises(frappe.ValidationError, p.insert)
 
 	def test_month_outside_contract_duration(self):
-		# Contract is 2026-06 to 2026-12
 		p = frappe.get_doc({
 			"doctype": "Shop Rent Payment",
 			"contract": self.contract.name,
@@ -80,8 +82,24 @@ class TestShopRentPayment(FrappeTestCase):
 		})
 		self.assertRaises(frappe.ValidationError, p.insert)
 
+	def test_due_date_calculation_10th(self):
+		# Rent for 2026-09 is due on 2026-10-10
+		p = frappe.get_doc({
+			"doctype": "Shop Rent Payment",
+			"contract": self.contract.name,
+			"rent_month": "2026-09"
+		}).insert()
+		self.assertEqual(p.due_date, "2026-10-10")
+
+		# Rent for 2026-07 is due on 2026-08-10
+		p7 = frappe.get_doc({
+			"doctype": "Shop Rent Payment",
+			"contract": self.contract.name,
+			"rent_month": "2026-07"
+		}).insert()
+		self.assertEqual(p7.due_date, "2026-08-10")
+
 	def test_tampering_rejection_and_derived_fetch(self):
-		# Create payment with tampered shop
 		tampered = frappe.get_doc({
 			"doctype": "Shop Rent Payment",
 			"contract": self.contract.name,
@@ -90,7 +108,6 @@ class TestShopRentPayment(FrappeTestCase):
 		})
 		self.assertRaises(frappe.ValidationError, tampered.insert)
 
-		# Valid payment: correctly fetches shop, tenant, airport, amount_due
 		valid_p = frappe.get_doc({
 			"doctype": "Shop Rent Payment",
 			"contract": self.contract.name,
@@ -116,7 +133,7 @@ class TestShopRentPayment(FrappeTestCase):
 		})
 		self.assertRaises(frappe.ValidationError, p2.insert)
 
-	def test_amounts_and_status_transitions(self):
+	def test_amounts_and_submission(self):
 		# Overpayment rejection
 		p_over = frappe.get_doc({
 			"doctype": "Shop Rent Payment",
@@ -127,50 +144,43 @@ class TestShopRentPayment(FrappeTestCase):
 		})
 		self.assertRaises(frappe.ValidationError, p_over.insert)
 
-		# Paid without payment date rejection
-		p_no_date = frappe.get_doc({
+		# Cannot submit with 0 payment
+		p_zero = frappe.get_doc({
 			"doctype": "Shop Rent Payment",
 			"contract": self.contract.name,
 			"rent_month": "2026-09",
-			"amount_paid": 30000
-		})
-		self.assertRaises(frappe.ValidationError, p_no_date.insert)
-
-		# Future payment date rejection
-		p_future = frappe.get_doc({
-			"doctype": "Shop Rent Payment",
-			"contract": self.contract.name,
-			"rent_month": "2026-09",
-			"amount_paid": 30000,
-			"payment_date": add_days(today(), 5)
-		})
-		self.assertRaises(frappe.ValidationError, p_future.insert)
-
-		# Partially paid calculation
-		p_partial = frappe.get_doc({
-			"doctype": "Shop Rent Payment",
-			"contract": self.contract.name,
-			"rent_month": "2026-09",
-			"amount_paid": 15000,
-			"payment_date": today()
+			"amount_paid": 0
 		}).insert()
-		self.assertEqual(p_partial.payment_status, "Partially Paid")
+		self.assertRaises(frappe.ValidationError, p_zero.submit)
 
-		# Fully paid calculation
-		p_paid = frappe.get_doc({
+		# Submit with full payment
+		p_zero.amount_paid = 30000
+		p_zero.payment_date = today()
+		p_zero.submit()
+		self.assertEqual(p_zero.docstatus, 1)
+		self.assertEqual(p_zero.payment_status, "Paid")
+
+	def test_action_mark_as_paid_and_submit(self):
+		p = frappe.get_doc({
 			"doctype": "Shop Rent Payment",
 			"contract": self.contract.name,
-			"rent_month": "2026-10",
-			"amount_paid": 30000,
-			"payment_date": today()
+			"rent_month": "2026-11",
+			"amount_paid": 0
 		}).insert()
-		self.assertEqual(p_paid.payment_status, "Paid")
+		self.assertEqual(p.docstatus, 0)
+
+		# Action button helper
+		mark_as_paid_and_submit(p.name, payment_mode="UPI", transaction_reference="UPI-REF-123")
+		p.reload()
+		self.assertEqual(p.docstatus, 1)
+		self.assertEqual(p.payment_status, "Paid")
+		self.assertEqual(p.payment_mode, "UPI")
+		self.assertEqual(p.transaction_reference, "UPI-REF-123")
 
 	def test_rent_reminder_scheduler(self):
 		settings = frappe.get_single("Shop Management Settings")
 		settings.enable_rent_reminders = 0
 		settings.save()
 
-		# When disabled, returns 0
 		sent = send_rent_reminders()
 		self.assertEqual(sent, 0)

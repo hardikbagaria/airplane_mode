@@ -3,7 +3,12 @@
 
 import frappe
 from frappe.tests.utils import FrappeTestCase
-from airplane_mode.airport_shop_management.doctype.shop_contract.shop_contract import generate_rent_schedule
+from airplane_mode.airport_shop_management.doctype.shop_contract.shop_contract import (
+	generate_due_rent_receipts,
+	generate_rent_receipt_for_month,
+	renew_contract,
+	terminate_contract,
+)
 
 
 class TestShopContract(FrappeTestCase):
@@ -67,7 +72,6 @@ class TestShopContract(FrappeTestCase):
 			"contract_start_date": "2026-12-31",
 			"contract_end_date": "2026-01-01",
 			"monthly_rent": 40000,
-			"contract_status": "Active"
 		})
 		self.assertRaises(frappe.ValidationError, c1.insert)
 
@@ -79,7 +83,6 @@ class TestShopContract(FrappeTestCase):
 			"contract_start_date": "2026-05-01",
 			"contract_end_date": "2026-05-01",
 			"monthly_rent": 40000,
-			"contract_status": "Active"
 		})
 		self.assertRaises(frappe.ValidationError, c2.insert)
 
@@ -91,11 +94,10 @@ class TestShopContract(FrappeTestCase):
 			"contract_start_date": "2026-01-01",
 			"contract_end_date": "2026-12-31",
 			"monthly_rent": -500,
-			"contract_status": "Active"
 		})
 		self.assertRaises(frappe.ValidationError, c.insert)
 
-	def test_contract_overlap_prevention(self):
+	def test_contract_submit_and_overlap_prevention(self):
 		# Contract A: 2026-01-01 to 2026-12-31
 		contract_a = frappe.get_doc({
 			"doctype": "Shop Contract",
@@ -104,9 +106,14 @@ class TestShopContract(FrappeTestCase):
 			"contract_start_date": "2026-01-01",
 			"contract_end_date": "2026-12-31",
 			"monthly_rent": 40000,
-			"contract_status": "Active"
 		}).insert()
-		self.assertTrue(contract_a.name)
+		self.assertEqual(contract_a.docstatus, 0)
+		self.assertEqual(contract_a.contract_status, "Draft")
+
+		# Submit contract A
+		contract_a.submit()
+		self.assertEqual(contract_a.docstatus, 1)
+		self.assertEqual(contract_a.contract_status, "Active")
 
 		# Verify shop is Occupied
 		shop = frappe.get_doc("Airport Shop", "TCA-501")
@@ -121,36 +128,52 @@ class TestShopContract(FrappeTestCase):
 			"contract_start_date": "2026-10-01",
 			"contract_end_date": "2027-09-30",
 			"monthly_rent": 42000,
-			"contract_status": "Active"
-		})
-		self.assertRaises(frappe.ValidationError, contract_b.insert)
+		}).insert()
+		# When submitted, should raise overlap validation error
+		self.assertRaises(frappe.ValidationError, contract_b.submit)
 
-	def test_schedule_generation_and_idempotence(self):
-		# Create contract for 3 months
+	def test_contract_cancel_and_shop_release(self):
 		contract = frappe.get_doc({
 			"doctype": "Shop Contract",
 			"shop": "TCA-501",
 			"tenant": "Test Contract Tenant 1",
 			"contract_start_date": "2026-01-01",
-			"contract_end_date": "2026-03-31",
+			"contract_end_date": "2026-12-31",
 			"monthly_rent": 40000,
-			"contract_status": "Active"
 		}).insert()
+		contract.submit()
 
-		payments = frappe.get_all(
-			"Shop Rent Payment",
-			filters={"contract": contract.name},
-			fields=["name", "rent_month", "amount_due", "payment_status"]
-		)
-		# Should have 3 payments: 2026-01, 2026-02, 2026-03
-		self.assertEqual(len(payments), 3)
+		# Shop is Occupied
+		self.assertEqual(frappe.db.get_value("Airport Shop", "TCA-501", "shop_status"), "Occupied")
 
-		# Run schedule generation again: must be idempotent and not create duplicates
-		new_payments = generate_rent_schedule(contract.name)
-		self.assertEqual(len(new_payments), 0)
+		# Cancel contract
+		contract.cancel()
+		self.assertEqual(contract.docstatus, 2)
+		self.assertEqual(contract.contract_status, "Cancelled")
 
-		payments_after = frappe.get_all(
-			"Shop Rent Payment",
-			filters={"contract": contract.name}
-		)
-		self.assertEqual(len(payments_after), 3)
+		# Shop should revert to Available
+		self.assertEqual(frappe.db.get_value("Airport Shop", "TCA-501", "shop_status"), "Available")
+		self.assertIsNone(frappe.db.get_value("Airport Shop", "TCA-501", "current_contract"))
+
+	def test_actions_terminate_and_renew(self):
+		contract = frappe.get_doc({
+			"doctype": "Shop Contract",
+			"shop": "TCA-501",
+			"tenant": "Test Contract Tenant 1",
+			"contract_start_date": "2026-01-01",
+			"contract_end_date": "2026-12-31",
+			"monthly_rent": 40000,
+		}).insert()
+		contract.submit()
+
+		# Terminate action
+		terminate_contract(contract.name)
+		contract.reload()
+		self.assertEqual(contract.contract_status, "Terminated")
+		self.assertEqual(frappe.db.get_value("Airport Shop", "TCA-501", "shop_status"), "Available")
+
+		# Renew action
+		renewed_name = renew_contract(contract.name)
+		renewed = frappe.get_doc("Shop Contract", renewed_name)
+		self.assertEqual(str(renewed.contract_start_date), "2027-01-01")
+		self.assertEqual(renewed.docstatus, 0)

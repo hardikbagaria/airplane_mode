@@ -79,7 +79,7 @@ class AirportShop(Document):
 
 		active_contract = frappe.db.get_value(
 			"Shop Contract",
-			{"shop": self.name, "contract_status": "Active"},
+			{"shop": self.name, "contract_status": "Active", "docstatus": 1},
 			["name", "tenant"],
 			as_dict=True,
 		)
@@ -139,3 +139,18 @@ def get_shop_statistics(airport=None):
 		stats["by_airport"] = by_airport
 
 	return stats
+
+
+@frappe.whitelist()
+def toggle_maintenance(shop_name):
+	"""
+	Action button helper to toggle an unoccupied shop between Available and Under Maintenance.
+	"""
+	shop = frappe.get_doc("Airport Shop", shop_name)
+	if shop.shop_status == "Occupied":
+		frappe.throw(_("Cannot change maintenance status of an Occupied shop."))
+
+	shop.shop_status = "Under Maintenance" if shop.shop_status == "Available" else "Available"
+	shop.save()
+	frappe.db.commit()
+	return shop.shop_status

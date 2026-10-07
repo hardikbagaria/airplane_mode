@@ -150,7 +150,7 @@ app_license = "mit"
 
 scheduler_events = {
 	"daily": [
-		"airplane_mode.airport_shop_management.tasks.send_rent_reminders"
+		"airplane_mode.airport_shop_management.tasks.daily_shop_management_tasks"
 	]
 }
 

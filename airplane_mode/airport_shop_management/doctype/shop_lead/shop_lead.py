@@ -57,3 +57,35 @@ class ShopLead(Document):
 		valid_statuses = ["New", "Contacted", "Converted", "Rejected"]
 		if self.status and self.status not in valid_statuses:
 			frappe.throw(_("Status must be one of: {0}.").format(", ".join(valid_statuses)))
+
+
+@frappe.whitelist()
+def convert_to_tenant(lead_name):
+	"""
+	Action button method to convert a Shop Lead into a new Shop Tenant.
+	"""
+	lead = frappe.get_doc("Shop Lead", lead_name)
+	if lead.status == "Converted":
+		frappe.throw(_("Lead {0} is already converted.").format(lead_name))
+
+	tenant_name = lead.name1.strip()
+	# Check if tenant with this name already exists
+	if frappe.db.exists("Shop Tenant", tenant_name):
+		tenant_name = f"{tenant_name} ({lead.name})"
+
+	tenant = frappe.get_doc(
+		{
+			"doctype": "Shop Tenant",
+			"tenant_name": tenant_name,
+			"company_name": lead.company_name or lead.name1,
+			"email": lead.email,
+			"phone": lead.phone,
+			"status": "Active",
+		}
+	)
+	tenant.insert()
+
+	lead.status = "Converted"
+	lead.save()
+	frappe.db.commit()
+	return tenant.name

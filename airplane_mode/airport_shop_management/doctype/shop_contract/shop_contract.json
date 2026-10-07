@@ -2,6 +2,7 @@
  "actions": [],
  "allow_rename": 1,
  "autoname": "CONT-.YYYY.-.#####",
+ "is_submittable": 1,
  "creation": "2026-10-07 17:34:41.257028",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -27,7 +28,8 @@
   "column_break_secp",
   "security_deposit",
   "section_break_qxyl",
-  "notes"
+  "notes",
+  "amended_from"
  ],
  "fields": [
   {
@@ -59,12 +61,13 @@
    "read_only": 1
   },
   {
-   "default": "Active",
+   "allow_on_submit": 1,
+   "default": "Draft",
    "fieldname": "contract_status",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Contract Status",
-   "options": "Draft\nActive\nExpired\nTerminated",
+   "options": "Draft\nActive\nExpired\nTerminated\nCancelled",
    "reqd": 1
   },
   {
@@ -171,18 +174,29 @@
    "fieldname": "notes",
    "fieldtype": "Small Text",
    "label": "Notes"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Shop Contract",
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-07 23:52:00.000000",
+ "modified": "2026-10-08 02:00:00.000000",
  "modified_by": "Administrator",
  "module": "Airport Shop Management",
  "name": "Shop Contract",
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -192,6 +206,7 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],

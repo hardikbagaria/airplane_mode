@@ -6,6 +6,69 @@ from frappe import _
 from frappe.utils import getdate, today, validate_email_address
 
 
+def daily_shop_management_tasks():
+	"""
+	Main daily scheduler event.
+	1. Updates overdue statuses for unpaid payments past due date.
+	2. Generates due monthly rent receipts for active contracts.
+	3. Sends rent reminders for Pending and Overdue payments.
+	"""
+	update_overdue_statuses()
+	generate_due_monthly_rent_receipts()
+	send_rent_reminders()
+
+
+def update_overdue_statuses():
+	"""
+	Automatically marks pending payments as Overdue if today is past the due date.
+	"""
+	current_date = getdate(today())
+	pending_payments = frappe.get_all(
+		"Shop Rent Payment",
+		filters={
+			"payment_status": "Pending",
+			"amount_paid": 0,
+			"docstatus": ["!=", 2],
+			"due_date": ["<", current_date],
+		},
+		fields=["name"],
+	)
+
+	for p in pending_payments:
+		frappe.db.set_value(
+			"Shop Rent Payment", p.name, "payment_status", "Overdue", update_modified=False
+		)
+
+	if pending_payments:
+		frappe.db.commit()
+
+
+def generate_due_monthly_rent_receipts():
+	"""
+	Checks all active submitted contracts and generates rent receipts for
+	any month where the generation date (5th of following month) has arrived.
+	"""
+	from airplane_mode.airport_shop_management.doctype.shop_contract.shop_contract import (
+		generate_due_rent_receipts,
+	)
+
+	active_contracts = frappe.get_all(
+		"Shop Contract",
+		filters={
+			"contract_status": "Active",
+			"docstatus": 1,
+		},
+		fields=["name"],
+	)
+
+	total_generated = 0
+	for c in active_contracts:
+		created = generate_due_rent_receipts(c.name)
+		total_generated += len(created)
+
+	return total_generated
+
+
 def send_rent_reminders():
 	"""
 	Daily scheduler task that sends rent reminders to tenants
@@ -26,6 +89,7 @@ def send_rent_reminders():
 		"Shop Rent Payment",
 		filters={
 			"payment_status": ["in", ["Pending", "Overdue"]],
+			"docstatus": ["!=", 2],
 		},
 		fields=[
 			"name",
