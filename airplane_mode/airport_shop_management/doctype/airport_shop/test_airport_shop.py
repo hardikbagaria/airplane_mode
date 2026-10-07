@@ -101,3 +101,35 @@ class TestAirportShop(FrappeTestCase):
 		self.assertIn("available", stats)
 		self.assertIn("occupied", stats)
 		self.assertIn("under_maintenance", stats)
+
+	def test_shop_type_validation(self):
+		if not frappe.db.exists("Shop Type", "Stall"):
+			frappe.get_doc({"doctype": "Shop Type", "shop_type": "Stall", "enabled": 1}).insert(ignore_permissions=True)
+		if not frappe.db.exists("Shop Type", "Disabled Type"):
+			frappe.get_doc({"doctype": "Shop Type", "shop_type": "Disabled Type", "enabled": 0}).insert(ignore_permissions=True)
+
+		# Valid enabled type
+		shop_ok = frappe.get_doc({
+			"doctype": "Airport Shop",
+			"shop_number": "T-104",
+			"shop_name": "Stall Shop",
+			"airport": "Test Airport Alpha",
+			"shop_type": "Stall",
+			"area": 100,
+			"rent_amount": 15000,
+			"shop_status": "Available"
+		}).insert()
+		self.assertEqual(shop_ok.shop_type, "Stall")
+
+		# Disabled type rejected
+		shop_bad = frappe.get_doc({
+			"doctype": "Airport Shop",
+			"shop_number": "T-105",
+			"shop_name": "Disabled Type Shop",
+			"airport": "Test Airport Alpha",
+			"shop_type": "Disabled Type",
+			"area": 100,
+			"rent_amount": 15000,
+			"shop_status": "Available"
+		})
+		self.assertRaises(frappe.ValidationError, shop_bad.insert)

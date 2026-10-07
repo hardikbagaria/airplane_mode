@@ -1,8 +1,16 @@
 // Copyright (c) 2026, Haradik Bagaria - AESPL and contributors
 // For license information, please see license.txt
-
 frappe.ui.form.on("Airport Shop", {
 	refresh(frm) {
+		// Filter shop_type to only show enabled types
+		frm.set_query("shop_type", function() {
+			return {
+				filters: {
+					enabled: 1
+				}
+			};
+		});
+
 		if (!frm.is_new() && frm.doc.shop_status) {
 			let indicator_map = {
 				"Available": "green",

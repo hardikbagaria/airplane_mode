@@ -21,6 +21,7 @@ def get_context(context):
 			"name",
 			"shop_number",
 			"shop_name",
+			"shop_type",
 			"airport",
 			"area",
 			"rent_amount",

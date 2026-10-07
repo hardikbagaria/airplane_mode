@@ -154,6 +154,14 @@ scheduler_events = {
 	]
 }
 
+# Fixtures
+# --------
+fixtures = [
+	"Shop Type"
+]
+
+after_migrate = "airplane_mode.airport_shop_management.doctype.shop_type.shop_type.create_default_shop_types"
+
 # Testing
 # -------
 

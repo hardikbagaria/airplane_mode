@@ -17,6 +17,7 @@ class AirportShop(Document):
 		self.validate_mandatory_fields()
 		self.validate_area()
 		self.validate_status()
+		self.validate_shop_type()
 		self.validate_unique_shop_number()
 		self.initialize_default_rent()
 		self.validate_contract_status_consistency()
@@ -37,6 +38,14 @@ class AirportShop(Document):
 		valid_statuses = ["Available", "Occupied", "Under Maintenance"]
 		if self.shop_status not in valid_statuses:
 			frappe.throw(_("Shop Status must be one of: {0}.").format(", ".join(valid_statuses)))
+
+	def validate_shop_type(self):
+		if self.shop_type:
+			is_enabled = frappe.db.get_value("Shop Type", self.shop_type, "enabled")
+			if is_enabled is None:
+				frappe.throw(_("Selected Shop Type '{0}' does not exist.").format(self.shop_type))
+			if not is_enabled:
+				frappe.throw(_("Selected Shop Type '{0}' is disabled.").format(self.shop_type))
 
 	def validate_unique_shop_number(self):
 		if self.is_new():

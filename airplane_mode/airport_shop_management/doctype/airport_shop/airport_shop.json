@@ -7,6 +7,7 @@
  "field_order": [
   "shop_number",
   "shop_name",
+  "shop_type",
   "airport",
   "area",
   "shop_status",
@@ -29,6 +30,14 @@
    "in_list_view": 1,
    "label": "Shop Name",
    "reqd": 1
+  },
+  {
+   "fieldname": "shop_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Shop Type",
+   "options": "Shop Type"
   },
   {
    "fieldname": "airport",

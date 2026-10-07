@@ -1,0 +1,29 @@
+[
+ {
+  "description": "Small kiosk or booth space in terminal hallways.",
+  "docstatus": 0,
+  "doctype": "Shop Type",
+  "enabled": 1,
+  "modified": "2026-10-08 02:00:00.000000",
+  "name": "Stall",
+  "shop_type": "Stall"
+ },
+ {
+  "description": "Open walk-through retail space along passenger pathways.",
+  "docstatus": 0,
+  "doctype": "Shop Type",
+  "enabled": 1,
+  "modified": "2026-10-08 02:00:00.000000",
+  "name": "Walk-through",
+  "shop_type": "Walk-through"
+ },
+ {
+  "description": "Standard enclosed retail store unit.",
+  "docstatus": 0,
+  "doctype": "Shop Type",
+  "enabled": 1,
+  "modified": "2026-10-08 02:00:00.000000",
+  "name": "Normal",
+  "shop_type": "Normal"
+ }
+]

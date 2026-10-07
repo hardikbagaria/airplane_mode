@@ -167,6 +167,12 @@
                         <td class="label">Shop Name:</td>
                         <td>{{ shop.shop_name }}</td>
                     </tr>
+                    {% if shop.shop_type %}
+                    <tr>
+                        <td class="label">Shop Type:</td>
+                        <td><span class="label" style="background: #edf2f7; color: #2d3748; padding: 3px 8px; border-radius: 4px; font-weight: 600;">{{ shop.shop_type }}</span></td>
+                    </tr>
+                    {% endif %}
                     <tr>
                         <td class="label">Airport:</td>
                         <td>{{ shop.airport }}</td>

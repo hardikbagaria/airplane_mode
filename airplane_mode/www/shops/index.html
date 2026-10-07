@@ -155,6 +155,9 @@
                     <section>
                         <h3 style="margin: 0 0 10px 0; font-size: 1.2rem; color: #2d3748;">{{ shop.shop_name }}</h3>
                         <p style="margin: 4px 0;"><strong>Airport:</strong> {{ shop.airport }}</p>
+                        {% if shop.shop_type %}
+                        <p style="margin: 4px 0;"><strong>Type:</strong> <span class="label" style="background: #edf2f7; color: #2d3748; padding: 2px 6px; border-radius: 3px;">{{ shop.shop_type }}</span></p>
+                        {% endif %}
                         <p style="margin: 4px 0;"><strong>Floor Area:</strong> {{ shop.area }} sq ft</p>
                         <p style="margin: 4px 0;"><strong>Monthly Rent:</strong> ₹{{ "{:,.2f}".format(shop.rent_amount or 0) }}</p>
                         {% if shop.description %}
