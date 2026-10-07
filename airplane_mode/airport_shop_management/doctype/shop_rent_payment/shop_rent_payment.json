@@ -1,0 +1,162 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-10-07 22:14:08.374701",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "connections_section",
+  "contract",
+  "tenant",
+  "column_break_ssyu",
+  "shop",
+  "section_break_kbsc",
+  "payment_date",
+  "due_date",
+  "rent_month",
+  "column_break_sifn",
+  "payment_status",
+  "amount_due",
+  "amount_paid",
+  "section_break_opvl",
+  "payment_mode",
+  "column_break_ofrn",
+  "transaction_reference",
+  "section_break_ljyz",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "payment_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Payment Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "shop",
+   "fieldtype": "Link",
+   "label": "Shop",
+   "options": "Airport Shop",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "label": "Tenant",
+   "options": "Shop Tenant",
+   "reqd": 1
+  },
+  {
+   "fieldname": "contract",
+   "fieldtype": "Link",
+   "label": "Contract",
+   "options": "Shop Contract",
+   "reqd": 1
+  },
+  {
+   "fieldname": "rent_month",
+   "fieldtype": "Date",
+   "label": "Rent Month",
+   "reqd": 1
+  },
+  {
+   "fieldname": "amount_due",
+   "fieldtype": "Currency",
+   "label": "Amount Due",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "amount_paid",
+   "fieldtype": "Currency",
+   "label": "Amount Paid",
+   "non_negative": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "label": "Due Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "payment_status",
+   "fieldtype": "Select",
+   "label": "Payment Status",
+   "options": "Pending\nPaid\nPartially Paid\nOverdue"
+  },
+  {
+   "fieldname": "payment_mode",
+   "fieldtype": "Select",
+   "label": "Payment Mode",
+   "options": "Cash\nBank Transfer\nUPI\nCheque\nOther"
+  },
+  {
+   "fieldname": "transaction_reference",
+   "fieldtype": "Data",
+   "label": "Transaction Reference"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "section_break_kbsc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "connections_section",
+   "fieldtype": "Section Break",
+   "label": "Connections"
+  },
+  {
+   "fieldname": "column_break_ssyu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_sifn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_opvl",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_ofrn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_ljyz",
+   "fieldtype": "Section Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-10-07 22:21:29.173350",
+ "modified_by": "Administrator",
+ "module": "Airport Shop Management",
+ "name": "Shop Rent Payment",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

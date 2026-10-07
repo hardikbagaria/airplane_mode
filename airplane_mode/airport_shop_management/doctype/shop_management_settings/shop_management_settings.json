@@ -1,50 +1,44 @@
 {
  "actions": [],
- "allow_rename": 1,
- "creation": "2026-09-29 00:15:33.170470",
+ "creation": "2026-10-07 23:25:47.198510",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "section_break_sekc",
-  "amended_from"
+  "default_rent_amount",
+  "enable_rent_reminders"
  ],
  "fields": [
   {
-   "fieldname": "section_break_sekc",
-   "fieldtype": "Section Break"
+   "fieldname": "default_rent_amount",
+   "fieldtype": "Currency",
+   "label": "Default Rent Amount",
+   "non_negative": 1
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Rent Payment",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
+   "default": "0",
+   "fieldname": "enable_rent_reminders",
+   "fieldtype": "Check",
+   "label": "Enable Rent Reminders"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
- "is_submittable": 1,
+ "issingle": 1,
  "links": [],
- "modified": "2026-09-29 00:15:33.170470",
+ "modified": "2026-10-07 23:26:13.337813",
  "modified_by": "Administrator",
  "module": "Airport Shop Management",
- "name": "Rent Payment",
+ "name": "Shop Management Settings",
  "owner": "Administrator",
  "permissions": [
   {
    "create": 1,
    "delete": 1,
    "email": 1,
-   "export": 1,
    "print": 1,
    "read": 1,
-   "report": 1,
    "role": "System Manager",
    "share": 1,
-   "submit": 1,
    "write": 1
   }
  ],

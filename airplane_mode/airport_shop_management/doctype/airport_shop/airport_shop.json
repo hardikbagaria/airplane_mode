@@ -1,21 +1,33 @@
 {
  "actions": [],
- "autoname": "{code}.-.###",
- "creation": "2026-09-28 22:47:19.884622",
+ "allow_rename": 1,
+ "creation": "2026-10-07 17:29:26.928156",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "shop_deatils_section",
-  "shop_no",
+  "shop_number",
+  "shop_name",
   "airport",
-  "code",
-  "is_rentable",
-  "column_break_rzxx",
   "area",
-  "facing",
-  "amended_from"
+  "shop_status",
+  "rent_amount",
+  "description"
  ],
  "fields": [
+  {
+   "fieldname": "shop_number",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Shop Number",
+   "reqd": 1
+  },
+  {
+   "fieldname": "shop_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Shop Name",
+   "reqd": 1
+  },
   {
    "fieldname": "airport",
    "fieldtype": "Link",
@@ -26,66 +38,39 @@
   },
   {
    "fieldname": "area",
-   "fieldtype": "Int",
-   "label": "Area",
-   "reqd": 1
-  },
-  {
-   "fieldname": "column_break_rzxx",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "facing",
-   "fieldtype": "Select",
-   "label": "Facing",
-   "options": "North\nSouth\nEast\nWest"
-  },
-  {
-   "fieldname": "shop_no",
-   "fieldtype": "Int",
+   "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Shop No",
+   "label": "Area",
    "non_negative": 1,
    "reqd": 1
   },
   {
-   "fieldname": "shop_deatils_section",
-   "fieldtype": "Section Break",
-   "label": "Shop Deatils"
+   "fieldname": "shop_status",
+   "fieldtype": "Select",
+   "label": "Shop Status",
+   "options": "Available\nOccupied\nUnder Maintenance",
+   "reqd": 1
   },
   {
-   "default": "0",
-   "fieldname": "is_rentable",
-   "fieldtype": "Check",
-   "label": "Is Rentable"
+   "fieldname": "rent_amount",
+   "fieldtype": "Currency",
+   "label": "Rent Amount",
+   "non_negative": 1,
+   "reqd": 1
   },
   {
-   "fetch_from": "airport.code",
-   "fieldname": "code",
-   "fieldtype": "Data",
-   "is_virtual": 1,
-   "label": "Code",
-   "read_only": 1
-  },
-  {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Airport Shop",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-09-28 23:52:32.317483",
+ "modified": "2026-10-07 17:31:25.300979",
  "modified_by": "Administrator",
  "module": "Airport Shop Management",
  "name": "Airport Shop",
- "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

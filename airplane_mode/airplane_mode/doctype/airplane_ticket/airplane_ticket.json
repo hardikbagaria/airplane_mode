@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_guest_to_view": 1,
- "autoname": "autoincrement",
+ "autoname": ".airplane.-.source_airport_code.-to-.destination_airport_code.-.###",
  "creation": "2026-09-09 01:33:08.745759",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -9,9 +9,11 @@
   "section_break_8otr",
   "passenger",
   "status",
+  "gate_no",
   "column_break_iqsf",
   "seat",
   "flight",
+  "airplane",
   "section_break_pzcg",
   "source_airport_code",
   "column_break_wwfx",
@@ -163,16 +165,31 @@
    "label": "Flight",
    "options": "Airplane Flight",
    "reqd": 1
+  },
+  {
+   "fetch_from": "flight.gate",
+   "fieldname": "gate_no",
+   "fieldtype": "Data",
+   "label": "Gate No",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "flight.airplane",
+   "fieldname": "airplane",
+   "fieldtype": "Data",
+   "is_virtual": 1,
+   "label": "Airplane",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-09-25 00:57:58.334125",
+ "modified": "2026-10-07 00:01:51.935788",
  "modified_by": "Administrator",
  "module": "Airplane Mode",
  "name": "Airplane Ticket",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

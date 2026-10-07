@@ -1,7 +1,7 @@
 // Copyright (c) 2026, Haradik Bagaria - AESPL and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("Airport Shop", {
+// frappe.ui.form.on("Shop Contract", {
 // 	refresh(frm) {
 
 // 	},
